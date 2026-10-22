@@ -1,1 +1,725 @@
 
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffc244">
+    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, instrukcje, FAQ i najczęstsze błędy.">
+    <title>Centrum Wiedzy Kuriera | Glovo LED Edition</title>
+
+    <style>
+        :root {
+            --yellow: #ffc244;
+            --green: #00e699;
+            --green-glow: #00a878;
+            --red-neon: #ff4d4d;
+            --purple-neon: #b366ff;
+            --blue-neon: #33ccff;
+            --dark-bg: #0d110e;
+            --card-bg: rgba(20, 26, 22, 0.75);
+            --card-border: rgba(0, 230, 153, 0.2);
+            --text-light: #f5f6f3;
+            --text-muted: #9ba19a;
+            --yellow-glow: rgba(255, 194, 68, 0.4);
+            --radius-xl: 22px;
+            --radius-md: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            color: var(--text-light);
+            background-color: var(--dark-bg);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 110px;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(255, 194, 68, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 230, 153, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        button, input {
+            font: inherit;
+            color: inherit;
+        }
+
+        /* --- LED ACCENTS & HEADER --- */
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 194, 68, 0.12) 0%, rgba(0, 230, 153, 0.06) 100%), #121814;
+            border-bottom: 2px solid var(--green);
+            box-shadow: 0 4px 25px rgba(0, 230, 153, 0.25);
+            padding: 26px 20px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            background: var(--yellow);
+            filter: blur(90px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 950px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(255, 194, 68, 0.12);
+            border: 1px solid var(--yellow);
+            border-radius: 20px;
+            color: var(--yellow);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 12px var(--yellow-glow);
+            text-transform: uppercase;
+        }
+
+        .led-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse-led 1.5s infinite;
+        }
+
+        @keyframes pulse-led {
+            0% { opacity: 0.4; box-shadow: 0 0 2px var(--green); }
+            50% { opacity: 1; box-shadow: 0 0 12px var(--green); }
+            100% { opacity: 0.4; box-shadow: 0 0 2px var(--green); }
+        }
+
+        .hero h1 {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .glovo-logo-header {
+            width: 68px;
+            height: 68px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 18px var(--yellow-glow));
+            transition: transform 0.3s ease;
+        }
+
+        .glovo-logo-header:hover {
+            transform: scale(1.08) rotate(4deg);
+        }
+
+        main {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 24px 16px 0;
+        }
+
+        /* --- VIEWS CONTROLLER --- */
+        .view-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- SEARCH BAR --- */
+        .search-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            background: rgba(18, 24, 20, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            color: var(--text-light);
+            font-size: 14px;
+            outline: none;
+            backdrop-filter: blur(12px);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--yellow);
+            box-shadow: 0 0 18px var(--yellow-glow), inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        /* --- HEADINGS & LED CARDS --- */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            text-align: left;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0.5;
+            transition: opacity 0.25s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--yellow);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 20px var(--yellow-glow);
+            background: rgba(30, 40, 33, 0.85);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+            background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+        }
+
+        .category-card .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .category-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .category-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        /* --- LED BACK BUTTON --- */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(0, 230, 153, 0.12);
+            border: 1px solid var(--green);
+            border-radius: var(--radius-md);
+            color: var(--green);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 0 12px rgba(0, 230, 153, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: var(--green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--green);
+        }
+
+        /* --- DETAIL PANEL STYLING --- */
+        .detail-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            margin-bottom: 25px;
+        }
+
+        .detail-card h2 {
+            font-size: 22px;
+            color: var(--yellow);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-card p {
+            color: #d0d5ce;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .detail-steps {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .detail-steps li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .detail-steps li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--green);
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--green);
+        }
+
+        /* --- ERRORS & FAQ SECTION --- */
+        .error-card {
+            background: rgba(255, 77, 77, 0.06);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.08);
+        }
+
+        .error-card h4 {
+            color: var(--red-neon);
+            font-size: 15px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-card .solution {
+            color: #e0e0e0;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 3px solid var(--green);
+        }
+
+        /* --- BOTTOM NAV BAR (LED) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 17, 14, 0.92);
+            backdrop-filter: blur(18px);
+            border-top: 1px solid var(--card-border);
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+            z-index: 100;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav-inner {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 0;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn span {
+            font-size: 20px;
+            filter: drop-shadow(0 0 2px transparent);
+            transition: transform 0.2s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            color: var(--yellow);
+            background: rgba(255, 194, 68, 0.1);
+        }
+
+        .nav-btn.active span {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 8px var(--yellow));
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO HEADER WITH LED ACCENTS -->
+    <header class="hero">
+        <div class="hero-inner">
+            <div>
+                <div class="brand-badge">
+                    <div class="led-dot"></div> CENTRUM WIEDZY KURIERA GLOVO
+                </div>
+                <h1>Witaj w świecie Glovo LED!</h1>
+                <p>Nawigacja po poradnikach, rozwiązaniach problemów i najczęstszych błędach.</p>
+            </div>
+
+            <!-- Glovo Official Vector Logo -->
+            <svg class="glovo-logo-header" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#00A878"/>
+                <circle cx="50" cy="50" r="42" fill="#FFC244"/>
+                <path d="M50 20C36.2 20 25 31.2 25 45C25 62 50 80 50 80C50 80 75 62 75 45C75 31.2 63.8 20 50 20ZM50 55C44.5 55 40 50.5 40 45C40 39.5 44.5 35 50 35C55.5 35 60 39.5 60 45C60 50.5 55.5 55 50 55Z" fill="#0d110e"/>
+            </svg>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- WIDOK 1: STRONA GŁÓWNA (HOME) -->
+        <section id="view-home" class="view-panel active">
+            <!-- SEARCH BAR -->
+            <div class="search-box">
+                <span class="search-icon">🔎</span>
+                <input 
+                    type="search" 
+                    id="main-search" 
+                    class="search-input" 
+                    placeholder="Wyszukaj kategorię lub problem (np. Off Slot, spóźnienie, kod PIN)..."
+                    oninput="filterCategoriesOnHome()"
+                >
+            </div>
+
+            <h2 class="section-title">💡 Wybierz kategorię wiedzy</h2>
+
+            <div class="categories-grid" id="categories-grid-container">
+                <div class="category-card" onclick="openCategoryView('start')">
+                    <span class="icon">🚀</span>
+                    <h3>Pierwsze kroki</h3>
+                    <p>Wymagane dokumenty, rejestracja i start pierwszej dostawy.</p>
+                </div>
+
+                <div class="category-card" onclick="openCategoryView('payouts')">
+                    <span class="icon">💰</span>
+                    <h3>Rozliczenia i wypłaty</h3>
+                    <p>Zasady płatności, przelewy, stawki i mnożniki cenowe.</p>
+                </div>
+
+                <div class="category-card" onclick="openCategoryView('sessions')">
+                    <span class="icon">📅</span>
+                    <h3>Sesje i Off Slot</h3>
+                    <p>Grafik godzinowy, dostępność i praca bez rezerwacji.</p>
+                </div>
+
+                <div class="category-card" onclick="openCategoryView('orders')">
+                    <span class="icon">🛵</span>
+                    <h3>Realizacja zamówień</h3>
+                    <p>Odbiór towaru, kontakt z klientem i wydanie przesyłki.</p>
+                </div>
+
+                <div class="category-card" onclick="openCategoryView('tech')">
+                    <span class="icon">⚙️</span>
+                    <h3>Problemy techniczne</h3>
+                    <p>Aplikacja Courier, usterki GPS i brak powiadomień.</p>
+                </div>
+
+                <div class="category-card" onclick="openCategoryView('errors')">
+                    <span class="icon">⚠️</span>
+                    <h3>FAQ – Najczęstsze błędy</h3>
+                    <p>Sprawdź czego unikać, aby nie obniżać swojej oceny.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- WIDOK 2: SZCZEGÓŁY KATEGORII (OPENED CONTENT VIEW) -->
+        <section id="view-details" class="view-panel">
+            <button class="back-button" onclick="navigateTo('home')">
+                ← Powrót do ekranu głównego
+            </button>
+
+            <div id="detail-content-area">
+                <!-- Treść ładuje się dynamicznie w JS -->
+            </div>
+        </section>
+
+
+        <!-- WIDOK 3: DEDYKOWANA ZAKŁADKA FAQ - NAJCZĘSTSZE BŁĘDY -->
+        <section id="view-errors-faq" class="view-panel">
+            <button class="back-button" onclick="navigateTo('home')">
+                ← Powrót do ekranu głównego
+            </button>
+
+            <div class="detail-card">
+                <h2>⚠️ FAQ — Najczęstsze błędy kurierów</h2>
+                <p>Lista pomyłek, które najczęściej prowadzą do obniżenia wskaźnika Excellence Score lub opóźnień.</p>
+
+                <div class="error-card">
+                    <h4>❌ 1. Niepotwierdzenie przybycia do lokalu na mapie</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Częsty błąd: Wchodzenie do restauracji bez kliknięcia "Jestem w lokalu".</p>
+                    <div class="solution">
+                        <strong>Korekta:</strong> Zawsze klikaj przycisk w aplikacji od razu po dotarciu na miejsce, aby algorytm zaliczył Ci czas oczekiwania.
+                    </div>
+                </div>
+
+                <div class="error-card">
+                    <h4>❌ 2. Ignorowanie czasu odmierzania braku kontaktu z klientem</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Częsty błąd: Odjeżdżanie spod adresu bez uruchomienia 10-minutowego zegara.</p>
+                    <div class="solution">
+                        <strong>Korekta:</strong> Jeśli klient nie odbiera, zadzwoń minimum 2 razy i włącz oficjalne odliczanie braku kontaktu w aplikacji.
+                    </div>
+                </div>
+
+                <div class="error-card">
+                    <h4>❌ 3. Brak noszenia torby izotermicznej do drzwi klienta</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Częsty błąd: Zostawianie torby na rowerze/w samochodzie i wnoszenie jedzenia w ręku.</p>
+                    <div class="solution">
+                        <strong>Korekta:</strong> Zamówienie musi być transportowane w zamkniętej torbie aż pod same drzwi odbiorcy (wymóg sanitarny).
+                    </div>
+                </div>
+
+                <div class="error-card">
+                    <h4>❌ 4. Samowolne anulowanie zamówień bez zgłoszenia na Chat</h4>
+                    <p style="font-size: 13px; color: var(--text-muted);">Częsty błąd: Odrzucanie przypisanego zamówienia w trakcie jego realizacji.</p>
+                    <div class="solution">
+                        <strong>Korekta:</strong> Gdy napotkasz problem z pojazdem lub zamówieniem, zawsze użyj opcji "Pomoc / Chat Support" w aplikacji.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            Centrum Wiedzy Kuriera Glovo · Projekt informacyjny
+        </footer>
+    </main>
+
+    <!-- BOTTOM LED NAVIGATION BAR -->
+    <nav class="bottom-nav">
+        <div class="nav-inner">
+            <button class="nav-btn active" id="nav-home" onclick="navigateTo('home')">
+                <span>🏠</span>Główna
+            </button>
+            <button class="nav-btn" id="nav-work" onclick="openCategoryView('orders')">
+                <span>🛵</span>Praca
+            </button>
+            <button class="nav-btn" id="nav-errors" onclick="navigateTo('errors')">
+                <span>⚠️</span>Błędy FAQ
+            </button>
+            <button class="nav-btn" id="nav-tech" onclick="openCategoryView('tech')">
+                <span>⚙️</span>Pomoc
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        "use strict";
+
+        // BAZA WIEDZY DLA poszczególnych KATEGORII
+        const categoryData = {
+            start: {
+                title: "🚀 Pierwsze kroki w Glovo",
+                description: "Kompleksowy przewodnik dla nowych kurierów rozpoczynających pracę.",
+                steps: [
+                    "Przygotuj ważny dowód osobisty/paszport oraz zaświadczenie o niekaralności.",
+                    "Podpisz umowę z wybranym partnerem rozliczeniowym lub zarejestruj własną firmę.",
+                    "Odbierz zatwierdzoną torbę izotermiczną z punktu wydawania sprzętu.",
+                    "Zaloguj się do aplikacji Courier, przejdź weryfikację twarzy i rozpocznij pierwszą sesję."
+                ]
+            },
+            payouts: {
+                title: "💰 Rozliczenia i Wypłaty",
+                description: "Szczegółowe zasady naliczania stawek i przelewów.",
+                steps: [
+                    "Rozliczenia wykonywane są w cyklach tygodniowych (raport w każdy poniedziałek).",
+                    "Przelewy trafiają na konto bankowe do środka lub czwartku.",
+                    "Stawka składa się z kwoty bazowej, przebytych kilometrów oraz czasu oczekiwania.",
+                    "Mnożniki (np. x1.5) naliczają się automatycznie podczas złych warunków pogodowych i szczytu."
+                ]
+            },
+            sessions: {
+                title: "📅 Sesje i praca Off Slot",
+                description: "Zasady organizacji grafiku i dostępności.",
+                steps: [
+                    "Grafik otwiera się w wyznaczone dni (poniedziałki/czwartki) według oceny Excellence Score.",
+                    "Rezerwacja godzin gwarantuje priorytet w przydzielaniu zamówień.",
+                    "Tryb Off-Slot pozwala dołączyć do realizacji bez rezerwacji, gdy w mieście jest wysoki popyt.",
+                    "Spóźnienie większe niż 15 minut na sesję powoduje automatyczne zwolnienie godziny."
+                ]
+            },
+            orders: {
+                title: "🛵 Realizacja zamówień",
+                description: "Instrukcja krok po kroku od odebrania do wydania przesyłki.",
+                steps: [
+                    "Po zaakceptowaniu zamówienia kieruj się nawigacją do wskazanego lokalu.",
+                    "W restauracji podaj numer zamówienia z aplikacji i sprawdź kompletność produktów.",
+                    "Upewnij się, że napoje i ciepłe posiłki są odpowiednio zabezpieczone w torbie.",
+                    "Po dotarciu do klienta wydaj przesyłkę i potwierdź kod PIN (jeśli jest wymagany)."
+                ]
+            },
+            tech: {
+                title: "⚙️ Problemy techniczne i Aplikacja",
+                description: "Rozwiązania typowych błędów z aplikacją i GPS.",
+                steps: [
+                    "Wyłącz optymalizację baterii dla aplikacji Courier w ustawieniach telefonu.",
+                    "Włącz wysoki poziom dokładności lokalizacji GPS.",
+                    "W przypadku braku internetu lub zawieszenia ekranu użyj opcji 'Wymuś zatrzymanie'.",
+                    "Zawsze aktualizuj aplikację do najnowszej wersji w sklepie Google Play / App Store."
+                ]
+            },
+            errors: {
+                title: "⚠️ Najczęstsze błędy kurierów",
+                description: "Przejdź do dedykowanej sekcji FAQ błędów.",
+                steps: []
+            }
+        };
+
+        // SYSTEM ZMIANY WIDOKÓW (SPA)
+        function navigateTo(viewName) {
+            // Ukryj wszystkie widoki
+            document.querySelectorAll(".view-panel").forEach(panel => {
+                panel.classList.remove("active");
+            });
+
+            // Odznacz nawigację
+            document.querySelectorAll(".nav-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            if (viewName === 'home') {
+                document.getElementById("view-home").classList.add("active");
+                document.getElementById("nav-home").classList.add("active");
+            } else if (viewName === 'errors') {
+                document.getElementById("view-errors-faq").classList.add("active");
+                document.getElementById("nav-errors").classList.add("active");
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // OTWIERANIE OKIENKA Z ODPOWIEDZIĄ KATEGORII
+        function openCategoryView(key) {
+            if (key === 'errors') {
+                navigateTo('errors');
+                return;
+            }
+
+            const data = categoryData[key];
+            if (!data) return;
+
+            const contentArea = document.getElementById("detail-content-area");
+
+            let stepsHTML = "";
+            data.steps.forEach(step => {
+                stepsHTML += `<li>${step}</li>`;
+            });
+
+            contentArea.innerHTML = `
+                <div class="detail-card">
+                    <h2>${data.title}</h2>
+                    <p>${data.description}</p>
+                    <h4 style="color: var(--green); margin-top: 18px; font-size: 15px;">Kluczowe zasady i instrukcje:</h4>
+                    <ul class="detail-steps">
+                        ${stepsHTML}
+                    </ul>
+                </div>
+            `;
+
+            // Ukryj inne widoki i pokaż szczegóły
+            document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
+            document.getElementById("view-details").classList.add("active");
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FILTROWANIE KATEGORII NA STRONIE GŁÓWNEJ
+        function filterCategoriesOnHome() {
+            const query = document.getElementById("main-search").value.toLowerCase().trim();
+            const cards = document.querySelectorAll("#categories-grid-container .category-card");
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? "block" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
