@@ -186,7 +186,7 @@
             box-shadow: 0 0 20px var(--green);
         }
 
-        /* --- FIREBASE CONFIG WIDGET (DLA UŻYTKOWNIKA) --- */
+        /* --- FIREBASE CONFIG WIDGET --- */
         .firebase-setup-box {
             background: rgba(255, 194, 68, 0.05);
             border: 1px dashed rgba(255, 194, 68, 0.4);
@@ -611,7 +611,6 @@
             appId: "ID_APLIKACJI"
         };
 
-        // Inicjalizacja Firebase (jeśli konfiguracja została podana)
         let db = null;
         let auth = null;
         try {
@@ -988,7 +987,7 @@
             }
         };
 
-        // LOKALNA PAMIĘĆ ZAPASOWA (JEŚLI BRAK FIREBASE)
+        // LOKALNA PAMIĘĆ ZAPASOWA (TRYB FALLBACK)
         let liveNewsList = JSON.parse(localStorage.getItem("glovo_live_news")) || [];
         let newsletterList = JSON.parse(localStorage.getItem("glovo_newsletter")) || [];
 
@@ -997,7 +996,6 @@
                 if (window.isFirebaseConfigured && window.db) {
                     const { collection, onSnapshot, query, orderBy } = window.firebaseTools;
                     
-                    // Nasłuch Live News w czasie rzeczywistym
                     onSnapshot(query(collection(window.db, "live_news"), orderBy("createdAt", "desc")), (snapshot) => {
                         liveNewsList = [];
                         snapshot.forEach((doc) => {
@@ -1008,7 +1006,6 @@
                         console.log("Tryb offline / brak uprawnień Firestore, używam localStorage");
                     });
 
-                    // Nasłuch Newsletter w czasie rzeczywistym
                     onSnapshot(query(collection(window.db, "newsletter"), orderBy("createdAt", "desc")), (snapshot) => {
                         newsletterList = [];
                         snapshot.forEach((doc) => {
@@ -1057,13 +1054,12 @@
             }
         }
 
-        // PANEL ADMINA - FUNKCJE PUBLIKACJI W CHMURZE
+        // PANEL ADMINA
         async function adminLogin() {
             const email = document.getElementById("admin-email").value;
             const password = document.getElementById("admin-password").value;
 
             if (!window.isFirebaseConfigured) {
-                // Tryb zapasowy lokalny
                 if (email === "admin@glovo.pl" && password === "1234") {
                     showAdminDashboard();
                 } else {
@@ -1116,7 +1112,6 @@
                 }
             }
 
-            // Fallback lokalny
             liveNewsList.unshift({ text, date: now });
             localStorage.setItem("glovo_live_news", JSON.stringify(liveNewsList));
             renderNewsAndNewsletter();
@@ -1149,7 +1144,6 @@
                 }
             }
 
-            // Fallback lokalny
             newsletterList.unshift({ title, content, date: now });
             localStorage.setItem("glovo_newsletter", JSON.stringify(newsletterList));
             renderNewsAndNewsletter();
@@ -1261,7 +1255,6 @@
             });
         }
 
-        // Uruchomienie synchronizacji po załadowaniu okna
         window.addEventListener('DOMContentLoaded', initDataSync);
     </script>
 </body>
