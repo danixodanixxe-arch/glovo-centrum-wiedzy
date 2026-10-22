@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffc244">
-    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News w czasie rzeczywistym, Asystent czasu, Newsletter i Panel Admina z bazą danych Firebase.">
+    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News, Asystent czasu, Newsletter i Panel Admina.">
     <title>Centrum Wiedzy Kuriera | Glovo LED Portal</title>
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
@@ -491,29 +488,6 @@
             cursor: pointer;
             width: 100%;
             box-shadow: 0 0 15px var(--yellow-glow);
-            transition: all 0.2s ease;
-        }
-
-        .btn-admin:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn-delete {
-            background: rgba(255, 77, 77, 0.2);
-            color: var(--red-neon);
-            border: 1px solid var(--red-neon);
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            float: right;
-            transition: all 0.2s ease;
-        }
-
-        .btn-delete:hover {
-            background: var(--red-neon);
-            color: #fff;
         }
 
         /* --- BOTTOM TILE NAVIGATION WITH COLLAPSE --- */
@@ -592,34 +566,6 @@
             color: var(--yellow);
         }
 
-        /* MODAL STYLES */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-box {
-            background: #141a16;
-            border: 1px solid var(--green);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 0 30px var(--green-glow);
-            text-align: center;
-        }
-
         footer {
             text-align: center;
             color: var(--text-muted);
@@ -640,15 +586,6 @@
 
 <body>
 
-    <!-- CUSTOM MODAL DIALOG (zamiast alert()) -->
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modal-title" style="color: var(--yellow); font-weight: 800; font-size: 18px; margin-bottom: 8px;">Powiadomienie</h3>
-            <p id="modal-message" style="font-size: 14px; color: #fff; margin-bottom: 20px;">Treść komunikatu...</p>
-            <button class="btn-admin" onclick="closeModal()">OK</button>
-        </div>
-    </div>
-
     <!-- HERO HEADER -->
     <header class="hero">
         <div class="hero-inner">
@@ -657,7 +594,7 @@
                     <div class="led-dot"></div> CENTRUM WIEDZY KURIERA GLOVO
                 </div>
                 <h1>Witaj w świecie Glovo LED!</h1>
-                <p>Oficjalne poradniki, Live News, Asystent i Panel Administratora z bazą Firebase.</p>
+                <p>Oficjalne poradniki, Live News, Asystent i Panel Administratora.</p>
             </div>
 
             <!-- Glovo Vector Logo -->
@@ -674,7 +611,7 @@
         <!-- LIVE TICKER BANNER -->
         <div class="ticker-wrap" onclick="navigateTo('news')">
             <span class="ticker-badge">LIVE NEWS</span>
-            <div class="ticker-text" id="live-ticker-text">Łączenie z bazą danych Firebase...</div>
+            <div class="ticker-text" id="live-ticker-text">Obecnie brak ważnych komunikatów.</div>
         </div>
 
         <!-- WIDOK 1: STRONA GŁÓWNA -->
@@ -759,7 +696,7 @@
                 <div class="category-card" onclick="navigateTo('newsletter')">
                     <span class="icon">📬</span>
                     <h3>Newsletter</h3>
-                    <p>Oficjalne ogłoszenia i komunikaty z chmury.</p>
+                    <p>Oficjalne ogłoszenia i komunikaty redakcyjne.</p>
                 </div>
 
                 <div class="category-card" onclick="navigateTo('assistant')">
@@ -787,11 +724,9 @@
             </button>
 
             <div class="detail-card">
-                <h2>📢 Live News & Alerty (Firebase na żywo)</h2>
-                <p>Na bieżąco aktualizowane komunikaty i ostrzeżenia synchronizowane w czasie rzeczywistym.</p>
-                <div id="news-container">
-                    <div class="empty-notice">Ładowanie powiadomień na żywo...</div>
-                </div>
+                <h2>📢 Live News & Alerty</h2>
+                <p>Na bieżąco aktualizowane komunikaty i ostrzeżenia dla kurierów.</p>
+                <div id="news-container"></div>
             </div>
         </section>
 
@@ -805,9 +740,7 @@
             <div class="detail-card">
                 <h2>📬 Tablica Newslettera</h2>
                 <p>Ogłoszenia, artykuły i biuletyny informacyjne dodawane przez administratora.</p>
-                <div id="newsletter-container">
-                    <div class="empty-notice">Ładowanie wpisów z chmury...</div>
-                </div>
+                <div id="newsletter-container"></div>
             </div>
         </section>
 
@@ -855,62 +788,56 @@
         </section>
 
 
-        <!-- WIDOK 7: PANEL ADMINA (FIREBASE AUTH) -->
+        <!-- WIDOK 7: PANEL ADMINA -->
         <section id="view-admin" class="view-panel">
             <button class="back-button" onclick="navigateTo('home')">
                 ← Powrót do ekranu głównego
             </button>
 
             <div class="detail-card" id="admin-login-box">
-                <h2>🔐 Panel Administratora (Weryfikacja w chmurze)</h2>
-                <p>Zaloguj się kontem administratora, aby publikować wiadomości do wszystkich użytkowników.</p>
-                
+                <h2>🔐 Panel Administratora</h2>
+                <p>Wprowadź kod PIN, aby zarządzać ogłoszeniami (domyślny PIN: <strong>1234</strong>).</p>
                 <div class="admin-form-group" style="margin-top: 15px;">
-                    <label>E-mail Administratora:</label>
-                    <input type="email" id="admin-email-input" placeholder="admin@glovo.pl" value="admin@glovo.pl">
+                    <label>Kod PIN:</label>
+                    <input type="password" id="admin-pin" placeholder="Wpisz PIN...">
                 </div>
-                <div class="admin-form-group">
-                    <label>Hasło lub PIN Chmury:</label>
-                    <input type="password" id="admin-password-input" placeholder="Wpisz hasło...">
-                </div>
-
-                <button class="btn-admin" id="btn-login-admin">Zaloguj się do Panelu Admina</button>
+                <button class="btn-admin" onclick="checkAdminPin()">Zaloguj się</button>
             </div>
 
             <div class="detail-card" id="admin-dashboard-box" style="display: none;">
-                <h2>🛠️ Panel Zarządzania Treścią w Czasie Rzeczywistym</h2>
-                <p style="color: var(--green);">Status: Zalogowano jako Administrator (<span id="admin-user-id">-</span>)</p>
+                <h2>🛠️ Panel Zarządzania Treścią</h2>
+                <p style="color: var(--green);">Zalogowano pomyślnie.</p>
 
                 <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
 
                 <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--yellow);">📢 Dodaj nowy Live News</h3>
                 <div class="admin-form-group">
-                    <label>Tytuł / Krótka treść powiadomienia:</label>
-                    <input type="text" id="new-news-text" placeholder="np. Nowy bonus w strefie centralnej +20%...">
+                    <label>Treść komunikatu (Live News):</label>
+                    <input type="text" id="new-news-text" placeholder="np. Nowy mnożnik x1.8 w strefie...">
                 </div>
-                <button class="btn-admin" id="btn-publish-news">Opublikuj Live News do wszystkich</button>
+                <button class="btn-admin" onclick="publishNews()">Opublikuj Live News</button>
 
                 <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 25px 0 20px 0;">
 
                 <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--yellow);">📬 Dodaj wpis do Newslettera</h3>
                 <div class="admin-form-group">
                     <label>Nagłówek ogłoszenia:</label>
-                    <input type="text" id="new-nl-title" placeholder="np. Zmiany w stawce bazowej...">
+                    <input type="text" id="new-nl-title" placeholder="np. Zmiany w grafiku...">
                 </div>
                 <div class="admin-form-group">
                     <label>Treść wiadomości:</label>
-                    <textarea id="new-nl-content" placeholder="Wpisz szczegółową treść biuletynu..."></textarea>
+                    <textarea id="new-nl-content" placeholder="Wpisz treść biuletynu..."></textarea>
                 </div>
-                <button class="btn-admin" id="btn-publish-nl">Opublikuj Newsletter w bazie</button>
+                <button class="btn-admin" onclick="publishNewsletter()">Opublikuj Newsletter</button>
 
                 <div style="margin-top: 25px; text-align: right;">
-                    <button class="back-button" style="background: rgba(255,77,77,0.12); border-color: var(--red-neon); color: var(--red-neon);" id="btn-logout-admin">Wyloguj się</button>
+                    <button class="back-button" style="background: rgba(255,77,77,0.12); border-color: var(--red-neon); color: var(--red-neon);" onclick="adminLogout()">Wyloguj się</button>
                 </div>
             </div>
         </section>
 
         <footer>
-            Centrum Wiedzy Kuriera Glovo · LED Portal z bazą danych Firebase Cloud
+            Centrum Wiedzy Kuriera Glovo · Projekt LED Portal
         </footer>
     </main>
 
@@ -944,283 +871,11 @@
         </div>
     </nav>
 
-    <!-- FIREBASE MODULES SCRIPT -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            doc, 
-            addDoc, 
-            deleteDoc, 
-            onSnapshot, 
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global app configuration fallback
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'glovo-courier-portal';
-        
-        // Konfiguracja Firebase z wykorzystaniem zmiennych środowiskowych lub wartości domyślnych
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDemoConfigKeyForGlovoPortal12345",
-            authDomain: "glovo-courier-portal.firebaseapp.com",
-            projectId: "glovo-courier-portal",
-            storageBucket: "glovo-courier-portal.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:glovo1234567890"
-        };
-
-        // Inicjalizacja aplikacji Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
-
-        // Ścieżki kolekcje w oparciu o wytyczne architektury
-        const newsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'news');
-        const newsletterCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'newsletter');
-
-        // FUNKCJA DLA MODALA ZAMIAST ALERT
-        window.showModal = function(title, msg) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = msg;
-            document.getElementById('custom-modal').classList.add('active');
-        };
-
-        window.closeModal = function() {
-            document.getElementById('custom-modal').classList.remove('active');
-        };
-
-        // INICJALIZACJA LOGOWANIA (NAJPIERW AUTH)
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.warn("Autoryzacja domyślna z użyciem logowania anonimowego:", err);
-                try {
-                    await signInAnonymously(auth);
-                } catch(e) {
-                    console.error("Błąd logowania:", e);
-                }
-            }
-        }
-
-        // MONITORY OBSŁUGI AUTH & REALTIME FIRESTORE
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                console.log("Zalogowano użytkownika Firebase:", user.uid);
-                
-                // Uruchomienie nasłuchiwania w czasie rzeczywistym
-                listenToLiveNews();
-                listenToNewsletter();
-
-                if (user.isAnonymous) {
-                    document.getElementById("admin-login-box").style.display = "block";
-                    document.getElementById("admin-dashboard-box").style.display = "none";
-                } else {
-                    document.getElementById("admin-login-box").style.display = "none";
-                    document.getElementById("admin-dashboard-box").style.display = "block";
-                    document.getElementById("admin-user-id").textContent = user.email || user.uid;
-                }
-            }
-        });
-
-        // NASŁUCHIVANIE KORZYSTAJĄC Z ONSNAPSHOT (RULE 3 Compliance)
-        function listenToLiveNews() {
-            if (!auth.currentUser) return;
-
-            onSnapshot(newsCollectionRef, (snapshot) => {
-                const items = [];
-                snapshot.forEach(docSnap => {
-                    items.push({ id: docSnap.id, ...docSnap.data() });
-                });
-
-                // Sortowanie w pamięci (zgodnie z RULE 2 - bez zapytania compound w Firestore)
-                items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                renderNewsUI(items);
-            }, (error) => {
-                console.error("Błąd pobierania newsów:", error);
-            });
-        }
-
-        function listenToNewsletter() {
-            if (!auth.currentUser) return;
-
-            onSnapshot(newsletterCollectionRef, (snapshot) => {
-                const items = [];
-                snapshot.forEach(docSnap => {
-                    items.push({ id: docSnap.id, ...docSnap.data() });
-                });
-
-                items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-                renderNewsletterUI(items);
-            }, (error) => {
-                console.error("Błąd pobierania newslettera:", error);
-            });
-        }
-
-        // RENDEROWANIE INTERFEJSU GRAFICZNEGO
-        function renderNewsUI(items) {
-            const ticker = document.getElementById("live-ticker-text");
-            const container = document.getElementById("news-container");
-
-            if (items.length === 0) {
-                ticker.textContent = "Obecnie brak ważnych komunikatów.";
-                container.innerHTML = `<div class="empty-notice">Obecnie brak Newsów.</div>`;
-                return;
-            }
-
-            ticker.textContent = `📢 ${items[0].text}`;
-
-            const isAdminLoggedIn = currentUser && !currentUser.isAnonymous;
-
-            container.innerHTML = items.map(item => `
-                <div class="news-item">
-                    ${isAdminLoggedIn ? `<button class="btn-delete" onclick="window.deleteNewsDoc('${item.id}')">Usuń</button>` : ''}
-                    <div class="news-date">${item.dateStr || 'Dzisiaj'}</div>
-                    <p style="font-size: 14px; color: #fff;">${item.text}</p>
-                </div>
-            `).join("");
-        }
-
-        function renderNewsletterUI(items) {
-            const container = document.getElementById("newsletter-container");
-
-            if (items.length === 0) {
-                container.innerHTML = `<div class="empty-notice">Obecnie brak Newsów w Newsletterze.</div>`;
-                return;
-            }
-
-            const isAdminLoggedIn = currentUser && !currentUser.isAnonymous;
-
-            container.innerHTML = items.map(item => `
-                <div class="news-item" style="border-left-color: var(--yellow);">
-                    ${isAdminLoggedIn ? `<button class="btn-delete" onclick="window.deleteNewsletterDoc('${item.id}')">Usuń</button>` : ''}
-                    <div class="news-date">${item.dateStr || 'Dzisiaj'}</div>
-                    <strong style="color: var(--yellow); font-size: 15px; display: block; margin-bottom: 6px;">${item.title}</strong>
-                    <p style="font-size: 13px; color: #d0d5ce;">${item.content}</p>
-                </div>
-            `).join("");
-        }
-
-        // AKCJE ADMINA - PUBLIKACJA DO FIRESTORE
-        document.getElementById("btn-publish-news").addEventListener("click", async () => {
-            const text = document.getElementById("new-news-text").value.trim();
-            if (!text) return window.showModal("Błąd", "Wpisz treść komunikatu!");
-
-            try {
-                const now = new Date().toLocaleString("pl-PL", { dateStyle: 'short', timeStyle: 'short' });
-                await addDoc(newsCollectionRef, {
-                    text: text,
-                    dateStr: now,
-                    createdAt: Date.now()
-                });
-                document.getElementById("new-news-text").value = "";
-                window.showModal("Sukces", "Live News został pomyślnie opublikowany dla wszystkich kurierów!");
-            } catch (e) {
-                console.error("Błąd zapisu:", e);
-                window.showModal("Błąd", "Nie udało się zapisać w chmurze.");
-            }
-        });
-
-        document.getElementById("btn-publish-nl").addEventListener("click", async () => {
-            const title = document.getElementById("new-nl-title").value.trim();
-            const content = document.getElementById("new-nl-content").value.trim();
-            if (!title || !content) return window.showModal("Błąd", "Wypełnij nagłówek i treść newslettera!");
-
-            try {
-                const now = new Date().toLocaleDateString("pl-PL");
-                await addDoc(newsletterCollectionRef, {
-                    title: title,
-                    content: content,
-                    dateStr: now,
-                    createdAt: Date.now()
-                });
-                document.getElementById("new-nl-title").value = "";
-                document.getElementById("new-nl-content").value = "";
-                window.showModal("Sukces", "Ogłoszenie newslettera zapisano w chmurze!");
-            } catch (e) {
-                console.error("Błąd zapisu newslettera:", e);
-                window.showModal("Błąd", "Nie udało się dodać artykułu.");
-            }
-        });
-
-        // USUWANIE WPISÓW
-        window.deleteNewsDoc = async function(docId) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news', docId));
-            } catch (e) {
-                console.error("Błąd usuwania:", e);
-            }
-        };
-
-        window.deleteNewsletterDoc = async function(docId) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'newsletter', docId));
-            } catch (e) {
-                console.error("Błąd usuwania newslettera:", e);
-            }
-        };
-
-        // LOGOWANIE ADMINA
-        document.getElementById("btn-login-admin").addEventListener("click", async () => {
-            const email = document.getElementById("admin-email-input").value.trim();
-            const pass = document.getElementById("admin-password-input").value;
-
-            if (!email || !pass) return window.showModal("Błąd", "Podaj email i hasło!");
-
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                window.showModal("Zalogowano", "Witaj w panelu zarządczym!");
-            } catch (err) {
-                console.warn("Próba logowania nieudana:", err);
-                // Domyślny fallback testowy dla ułatwienia
-                if (pass === "1234" || pass === "admin") {
-                    document.getElementById("admin-login-box").style.display = "none";
-                    document.getElementById("admin-dashboard-box").style.display = "block";
-                    document.getElementById("admin-user-id").textContent = email;
-                    window.showModal("Tryb Lokalny Admina", "Zalogowano kodem PIN.");
-                } else {
-                    window.showModal("Błąd autoryzacji", "Nieprawidłowe dane logowania.");
-                }
-            }
-        });
-
-        document.getElementById("btn-logout-admin").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                await signInAnonymously(auth);
-                window.showModal("Wylogowano", "Opuszczono panel administratora.");
-            } catch (e) {
-                location.reload();
-            }
-        });
-
-        // Start autoryzacji
-        initAuth();
-    </script>
-
-    <!-- INTERAKCJE I STRUKTURA INTERFEJSU -->
+    <!-- GŁÓWNY SKRYPT APLIKACJI -->
     <script>
         "use strict";
 
-        // DANE KATEGORII WIEDZY KURIERSKIEJ
+        // BAZA KATEGORII WIEDZY
         const categoryData = {
             start: {
                 title: "🚀 Pierwsze kroki w Glovo",
@@ -1274,6 +929,87 @@
             }
         };
 
+        // POBIERANIE / ZAPIS DANYCH
+        let liveNewsList = JSON.parse(localStorage.getItem("glovo_live_news")) || [];
+        let newsletterList = JSON.parse(localStorage.getItem("glovo_newsletter")) || [];
+
+        function renderNewsAndNewsletter() {
+            const ticker = document.getElementById("live-ticker-text");
+            if (liveNewsList.length > 0) {
+                ticker.textContent = `📢 ${liveNewsList[0].text}`;
+            } else {
+                ticker.textContent = "Obecnie brak ważnych komunikatów.";
+            }
+
+            const newsContainer = document.getElementById("news-container");
+            if (liveNewsList.length === 0) {
+                newsContainer.innerHTML = `<div class="empty-notice">Obecnie brak Newsów.</div>`;
+            } else {
+                newsContainer.innerHTML = liveNewsList.map(item => `
+                    <div class="news-item">
+                        <div class="news-date">${item.date}</div>
+                        <p style="font-size: 14px; color: #fff;">${item.text}</p>
+                    </div>
+                `).join("");
+            }
+
+            const nlContainer = document.getElementById("newsletter-container");
+            if (newsletterList.length === 0) {
+                nlContainer.innerHTML = `<div class="empty-notice">Brak opublikowanych biuletynów w newsletterze.</div>`;
+            } else {
+                nlContainer.innerHTML = newsletterList.map(item => `
+                    <div class="news-item" style="border-left-color: var(--yellow);">
+                        <div class="news-date">${item.date}</div>
+                        <strong style="color: var(--yellow); font-size: 15px; display: block; margin-bottom: 6px;">${item.title}</strong>
+                        <p style="font-size: 13px; color: #d0d5ce;">${item.content}</p>
+                    </div>
+                `).join("");
+            }
+        }
+
+        // PANEL ADMINA (PIN: 1234)
+        function checkAdminPin() {
+            const pin = document.getElementById("admin-pin").value;
+            if (pin === "1234") {
+                document.getElementById("admin-login-box").style.display = "none";
+                document.getElementById("admin-dashboard-box").style.display = "block";
+            } else {
+                alert("Nieprawidłowy PIN! Domyślny PIN to: 1234");
+            }
+        }
+
+        function adminLogout() {
+            document.getElementById("admin-pin").value = "";
+            document.getElementById("admin-dashboard-box").style.display = "none";
+            document.getElementById("admin-login-box").style.display = "block";
+        }
+
+        function publishNews() {
+            const text = document.getElementById("new-news-text").value.trim();
+            if (!text) return alert("Wpisz treść komunikatu!");
+
+            const now = new Date().toLocaleString("pl-PL", { dateStyle: 'short', timeStyle: 'short' });
+            liveNewsList.unshift({ text, date: now });
+            localStorage.setItem("glovo_live_news", JSON.stringify(liveNewsList));
+            renderNewsAndNewsletter();
+            document.getElementById("new-news-text").value = "";
+            alert("Live News został opublikowany!");
+        }
+
+        function publishNewsletter() {
+            const title = document.getElementById("new-nl-title").value.trim();
+            const content = document.getElementById("new-nl-content").value.trim();
+            if (!title || !content) return alert("Wypełnij wszystkie pola newslettera!");
+
+            const now = new Date().toLocaleDateString("pl-PL");
+            newsletterList.unshift({ title, content, date: now });
+            localStorage.setItem("glovo_newsletter", JSON.stringify(newsletterList));
+            renderNewsAndNewsletter();
+            document.getElementById("new-nl-title").value = "";
+            document.getElementById("new-nl-content").value = "";
+            alert("Newsletter został opublikowany!");
+        }
+
         // ASYSTENT CZASU (STOPER)
         let timerInterval = null;
         let secondsElapsed = 0;
@@ -1303,7 +1039,7 @@
             document.getElementById("timer-display").textContent = `${mins}:${secs}`;
         }
 
-        // ZWIJANIE DOLNEGO MENU KAFELKOWEGO
+        // ZWIJANIE DOLNEGO MENU
         let isNavCollapsed = false;
         function toggleBottomNav() {
             isNavCollapsed = !isNavCollapsed;
@@ -1318,12 +1054,12 @@
             }
         }
 
-        // CHECKLISTA KURIERA
+        // CHECKLISTA
         function toggleCheck(element) {
             element.classList.toggle("checked");
         }
 
-        // ZMIANA WIDOKÓW
+        // NAWIGACJA WIDOKÓW
         function navigateTo(viewName) {
             document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
             document.querySelectorAll(".nav-tile").forEach(tile => tile.classList.remove("active"));
@@ -1337,7 +1073,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // WYŚWIETLANIE SZCZEGÓŁÓW KATEGORII
+        // OTWIERANIE KATEGORIE WIEDZY
         function openCategoryView(key) {
             const data = categoryData[key];
             if (!data) return;
@@ -1366,7 +1102,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // FILTROWANIE WYSZUKIWARKI
+        // WYSZUKIWARKA NA STRONIE GŁÓWNEJ
         function filterCategoriesOnHome() {
             const query = document.getElementById("main-search").value.toLowerCase().trim();
             const cards = document.querySelectorAll("#categories-grid-container .category-card");
@@ -1376,6 +1112,9 @@
                 card.style.display = text.includes(query) ? "block" : "none";
             });
         }
+
+        // Inicjalizacja widoku
+        renderNewsAndNewsletter();
     </script>
 </body>
 </html>
