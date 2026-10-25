@@ -415,13 +415,6 @@
             margin-bottom: 4px;
         }
 
-        .empty-notice {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
         /* --- ASYSTENT CZASU --- */
         .timer-display {
             font-size: 42px;
@@ -520,7 +513,7 @@
         .btn-edit { background: var(--blue-neon); color: var(--dark-bg); }
         .btn-del { background: var(--red-neon); color: #fff; }
 
-        /* --- BOTTOM TILE NAVIGATION WITH COLLAPSE --- */
+        /* --- BOTTOM TILE NAVIGATION --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -552,7 +545,7 @@
         }
 
         .nav-inner {
-            max-width: 750px;
+            max-width: 950px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -706,7 +699,7 @@
                 <div class="category-card" onclick="openCategoryView('start')">
                     <span class="icon">🚀</span>
                     <h3>Pierwsze kroki</h3>
-                    <p>Wymagane dokumenty do rejstracji krok po kroku.</p>
+                    <p>Wymagane dokumenty do rejestracji krok po kroku.</p>
                 </div>
 
                 <div class="category-card" onclick="openCategoryView('payouts')">
@@ -842,12 +835,24 @@
 
             <div class="detail-card" id="admin-login-box">
                 <h2>🔐 Panel Administratora</h2>
-                <p>Wprowadź kod PIN, aby zarządzać ogłoszeniami (domyślny PIN: <strong>1234</strong>).</p>
+                <p>Wprowadź adres e-mail, ID oraz kod PIN, aby zarządzać ogłoszeniami (domyślny PIN: <strong>1234</strong>).</p>
+                
                 <div class="admin-form-group" style="margin-top: 15px;">
-                    <label>Kod PIN:</label>
-                    <input type="password" id="admin-pin" placeholder="Wpisz PIN...">
+                    <label for="admin-email">Adres e-mail:</label>
+                    <input type="email" id="admin-email" placeholder="Wpisz e-mail (np. admin@example.com)...">
                 </div>
-                <button class="btn-admin" onclick="checkAdminPin()">Zaloguj się</button>
+
+                <div class="admin-form-group" style="margin-top: 15px;">
+                    <label for="admin-id">ID użytkownika:</label>
+                    <input type="text" id="admin-id" placeholder="Wpisz ID (np. admin123)...">
+                </div>
+
+                <div class="admin-form-group" style="margin-top: 15px;">
+                    <label for="admin-pin">Kod PIN:</label>
+                    <input type="password" id="admin-pin" placeholder="Wpisz PIN..." onkeydown="if(event.key === 'Enter') checkAdminLogin()">
+                </div>
+
+                <button class="btn-admin" onclick="checkAdminLogin()" style="margin-top: 10px;">Zaloguj się</button>
             </div>
 
             <div class="detail-card" id="admin-dashboard-box" style="display: none;">
@@ -912,16 +917,13 @@
                 <span>📢</span><p>News</p>
             </div>
             <div class="nav-tile" id="tile-newsletter" onclick="navigateTo('newsletter')">
-                <span>📬</span><p>Biuletyn</p>
+                <span>📬</span><p>Newsletter</p>
             </div>
             <div class="nav-tile" id="tile-assistant" onclick="navigateTo('assistant')">
-                <span>⏱️</span><p>Asystent</p>
+                <span>⏱️</span><p>Stoper</p>
             </div>
             <div class="nav-tile" id="tile-errors" onclick="navigateTo('errors')">
-                <span>⚠️</span><p>Błędy</p>
-            </div>
-            <div class="nav-tile" id="tile-work" onclick="openCategoryView('orders')">
-                <span>🛵</span><p>Praca</p>
+                <span>⚠️</span><p>FAQ</p>
             </div>
             <div class="nav-tile" id="tile-admin" onclick="navigateTo('admin')">
                 <span>🔐</span><p>Admin</p>
@@ -929,263 +931,82 @@
         </div>
     </nav>
 
-    <!-- GŁÓWNY SKRYPT APLIKACJI -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        "use strict";
+        // Data Structures
+        let newsData = [
+            { id: 1, date: 'Dzisiaj, 14:30', text: 'Wysokie zapotrzebowanie w Strefie Centrum (mnożnik 1.5x).' }
+        ];
 
-        // BAZA KATEGORII WIEDZY
-        const categoryData = {
-            start: {
-                title: "🚀 Pierwsze kroki w Glovo",
-                description: "Kompleksowy przewodnik dla nowych kurierów rozpoczynających pracę.",
-                steps: [
-                    "Przygotuj ważny dowód osobisty/paszport oraz zaświadczenie o niekaralności.",
-                    "Podpisz umowę z wybranym partnerem rozliczeniowym lub zarejestruj własną firmę.",
-                    "Odbierz zatwierdzoną torbę izotermiczną z punktu wydawania sprzętu.",
-                    "Zaloguj się do aplikacji Courier, przejdź weryfikację twarzy i rozpocznij pierwszą sesję."
-                ]
-            },
-            payouts: {
-                title: "💰 Rozliczenia i Wypłaty",
-                description: "Szczegółowe zasady naliczania stawek i przelewów.",
-                steps: [
-                    "Rozliczenia wykonywane są w cyklach tygodniowych (raport w każdy poniedziałek).",
-                    "Przelewy trafiają na konto bankowe do środka lub czwartku.",
-                    "Stawka składa się z kwoty bazowej, przebytych kilometrów oraz czasu oczekiwania.",
-                    "Mnożniki (np. x1.5) naliczają się automatycznie podczas złych warunków pogodowych i szczytu."
-                ]
-            },
-            sessions: {
-                title: "📅 Sesje i praca Off Slot",
-                description: "Zasady organizacji grafiku i dostępności.",
-                steps: [
-                    "Grafik otwiera się w wyznaczone dni (poniedziałki/czwartki) według oceny Excellence Score.",
-                    "Rezerwacja godzin gwarantuje priorytet w przydzielaniu zamówień.",
-                    "Tryb Off-Slot pozwala dołączyć do realizacji bez rezerwacji, gdy w mieście jest wysoki popyt.",
-                    "Spóźnienie większe niż 15 minut na sesję powoduje automatyczne zwolnienie godziny."
-                ]
-            },
-            orders: {
-                title: "🛵 Realizacja zamówień",
-                description: "Instrukcja krok po kroku od odebrania do wydania przesyłki.",
-                steps: [
-                    "Po zaakceptowaniu zamówienia kieruj się nawigacją do wskazanego lokalu.",
-                    "W restauracji podaj numer zamówienia z aplikacji i sprawdź kompletność produktów.",
-                    "Upewnij się, że napoje i ciepłe posiłki są odpowiednio zabezpieczone w torbie.",
-                    "Po dotarciu do klienta wydaj przesyłkę i potwierdź kod PIN (jeśli jest wymagany)."
-                ]
-            },
-            tech: {
-                title: "⚙️ Problemy techniczne i Aplikacja",
-                description: "Rozwiązania typowych błędów z aplikacją i GPS.",
-                steps: [
-                    "Wyłącz optymalizację baterii dla aplikacji Courier w ustawieniach telefonu.",
-                    "Włącz wysoki poziom dokładności lokalizacji GPS.",
-                    "W przypadku braku internetu lub zawieszenia ekranu użyj opcji 'Wymuś zatrzymanie'.",
-                    "Zawsze aktualizuj aplikację do najnowszej wersji w sklepie Google Play / App Store."
-                ]
-            }
+        let newsletterData = [
+            { id: 1, date: '25.10.2026', title: 'Nowy system rozliczeń', content: 'Wprowadziliśmy zaktualizowane procedury wypłat w najbliższym tygodniu.' }
+        ];
+
+        const categoryDetails = {
+            'start': { title: '🚀 Pierwsze kroki', content: 'Opis procedury rejestracji, dostarczenia dokumentów oraz aktywacji konta kuriera Glovo.' },
+            'payouts': { title: '💰 Rozliczenia i wypłaty', content: 'Szczegółowe informacje o cotygodniowych przelewach, fakturach oraz rozliczeniach z partnerami.' },
+            'sessions': { title: '📅 Off Slot', content: 'Zasady dołączania do stref bez rezerwowania konkretnych godzin w grafiku.' },
+            'orders': { title: '🛵 Realizacja zamówień', content: 'Poradnik dotyczący odbioru zamówień z lokali i prawidłowego wydawania ich klientom.' },
+            'tech': { title: '⚙️ Problemy techniczne', content: 'Rozwiązywanie problemów z lokalizacją GPS, zawieszaniem się aplikacji lub brakiem zleceń.' }
         };
 
-        // POBIERANIE / ZAPIS DANYCH
-        let liveNewsList = JSON.parse(localStorage.getItem("glovo_live_news")) || [];
-        let newsletterList = JSON.parse(localStorage.getItem("glovo_newsletter")) || [];
+        // Navigation Controller
+        function navigateTo(viewId) {
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.nav-tile').forEach(tile => tile.classList.remove('active'));
 
-        function renderNewsAndNewsletter() {
-            // Ticker na górze
-            const ticker = document.getElementById("live-ticker-text");
-            if (liveNewsList.length > 0) {
-                ticker.textContent = `📢 ${liveNewsList[0].text}`;
-            } else {
-                ticker.textContent = "Obecnie brak ważnych komunikatów.";
-            }
+            const targetPanel = document.getElementById('view-' + viewId);
+            const targetTile = document.getElementById('tile-' + viewId);
 
-            // Widok Live News dla kurierów
-            const newsContainer = document.getElementById("news-container");
-            if (liveNewsList.length === 0) {
-                newsContainer.innerHTML = `<div class="empty-notice">Obecnie brak Newsów.</div>`;
-            } else {
-                newsContainer.innerHTML = liveNewsList.map(item => `
-                    <div class="news-item">
-                        <div class="news-date">${item.date}</div>
-                        <p style="font-size: 14px; color: #fff;">${item.text}</p>
-                    </div>
-                `).join("");
-            }
+            if (targetPanel) targetPanel.classList.add('active');
+            if (targetTile) targetTile.classList.add('active');
 
-            // Widok Newsletter dla kurierów
-            const nlContainer = document.getElementById("newsletter-container");
-            if (newsletterList.length === 0) {
-                nlContainer.innerHTML = `<div class="empty-notice">Brak opublikowanych biuletynów w newsletterze.</div>`;
-            } else {
-                nlContainer.innerHTML = newsletterList.map(item => `
-                    <div class="news-item" style="border-left-color: var(--yellow);">
-                        <div class="news-date">${item.date}</div>
-                        <strong style="color: var(--yellow); font-size: 15px; display: block; margin-bottom: 6px;">${item.title}</strong>
-                        <p style="font-size: 13px; color: #d0d5ce;">${item.content}</p>
-                    </div>
-                `).join("");
-            }
-
-            // Widok zarządczym w panelu admina
-            renderAdminLists();
-        }
-
-        function renderAdminLists() {
-            // Lista Live News w panelu Admina
-            const adminNewsList = document.getElementById("admin-news-list");
-            if (liveNewsList.length === 0) {
-                adminNewsList.innerHTML = `<p style="font-size: 12px; color: var(--text-muted);">Brak wpisów.</p>`;
-            } else {
-                adminNewsList.innerHTML = liveNewsList.map((item, index) => `
-                    <div class="admin-manage-item">
-                        <div style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px;">
-                            <strong>${item.date}:</strong> ${item.text}
-                        </div>
-                        <div class="admin-manage-actions">
-                            <button class="btn-sm btn-edit" onclick="editNews(${index})">Edytuj</button>
-                            <button class="btn-sm btn-del" onclick="deleteNews(${index})">Usuń</button>
-                        </div>
-                    </div>
-                `).join("");
-            }
-
-            // Lista Newsletterów w panelu Admina
-            const adminNlList = document.getElementById("admin-nl-list");
-            if (newsletterList.length === 0) {
-                adminNlList.innerHTML = `<p style="font-size: 12px; color: var(--text-muted);">Brak wpisów.</p>`;
-            } else {
-                adminNlList.innerHTML = newsletterList.map((item, index) => `
-                    <div class="admin-manage-item">
-                        <div style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px;">
-                            <strong>${item.title}</strong>
-                        </div>
-                        <div class="admin-manage-actions">
-                            <button class="btn-sm btn-edit" onclick="editNewsletter(${index})">Edytuj</button>
-                            <button class="btn-sm btn-del" onclick="deleteNewsletter(${index})">Usuń</button>
-                        </div>
-                    </div>
-                `).join("");
-            }
-        }
-
-        // PANEL ADMINA (PIN: 1234)
-        function checkAdminPin() {
-            const pin = document.getElementById("admin-pin").value;
-            if (pin === "1234") {
-                document.getElementById("admin-login-box").style.display = "none";
-                document.getElementById("admin-dashboard-box").style.display = "block";
-            } else {
-                alert("Nieprawidłowy PIN! Domyślny PIN to: 1234");
-            }
-        }
-
-        function adminLogout() {
-            document.getElementById("admin-pin").value = "";
-            document.getElementById("admin-dashboard-box").style.display = "none";
-            document.getElementById("admin-login-box").style.display = "block";
-        }
-
-        // --- LIVE NEWS: DODawanie / Edycja / Usuwanie ---
-        function saveNews() {
-            const text = document.getElementById("new-news-text").value.trim();
-            const editIndex = parseInt(document.getElementById("edit-news-index").value);
-
-            if (!text) return alert("Wpisz treść komunikatu!");
-
-            const now = new Date().toLocaleString("pl-PL", { dateStyle: 'short', timeStyle: 'short' });
-
-            if (editIndex > -1) {
-                // Edycja istniejącego
-                liveNewsList[editIndex].text = text;
-                document.getElementById("edit-news-index").value = -1;
-                document.getElementById("news-form-title").textContent = "📢 Dodaj nowy Live News";
-                document.getElementById("news-submit-btn").textContent = "Opublikuj Live News";
-                alert("Live News został zaktualizowany!");
-            } else {
-                // Nowy wpis
-                liveNewsList.unshift({ text, date: now });
-                alert("Live News został opublikowany!");
-            }
-
-            localStorage.setItem("glovo_live_news", JSON.stringify(liveNewsList));
-            document.getElementById("new-news-text").value = "";
-            renderNewsAndNewsletter();
-        }
-
-        function editNews(index) {
-            const item = liveNewsList[index];
-            document.getElementById("new-news-text").value = item.text;
-            document.getElementById("edit-news-index").value = index;
-            document.getElementById("news-form-title").textContent = "✏️ Edytuj Live News";
-            document.getElementById("news-submit-btn").textContent = "Zapisz zmiany";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function deleteNews(index) {
-            if (confirm("Czy na pewno chcesz usunąć ten komunikat?")) {
-                liveNewsList.splice(index, 1);
-                localStorage.setItem("glovo_live_news", JSON.stringify(liveNewsList));
-                renderNewsAndNewsletter();
-            }
+        function openCategoryView(catKey) {
+            const data = categoryDetails[catKey];
+            if (!data) return;
+
+            const contentArea = document.getElementById('detail-content-area');
+            contentArea.innerHTML = `
+                <div class="detail-card">
+                    <h2>${data.title}</h2>
+                    <p>${data.content}</p>
+                </div>
+            `;
+            navigateTo('details');
         }
 
-        // --- NEWSLETTER: Dodawanie / Edycja / Usuwanie ---
-        function saveNewsletter() {
-            const title = document.getElementById("new-nl-title").value.trim();
-            const content = document.getElementById("new-nl-content").value.trim();
-            const editIndex = parseInt(document.getElementById("edit-nl-index").value);
-
-            if (!title || !content) return alert("Wypełnij wszystkie pola newslettera!");
-
-            const now = new Date().toLocaleDateString("pl-PL");
-
-            if (editIndex > -1) {
-                // Edycja istniejącego
-                newsletterList[editIndex].title = title;
-                newsletterList[editIndex].content = content;
-                document.getElementById("edit-nl-index").value = -1;
-                document.getElementById("nl-form-title").textContent = "📬 Dodaj wpis do Newslettera";
-                document.getElementById("nl-submit-btn").textContent = "Opublikuj Newsletter";
-                alert("Newsletter został zaktualizowany!");
-            } else {
-                // Nowy wpis
-                newsletterList.unshift({ title, content, date: now });
-                alert("Newsletter został opublikowany!");
-            }
-
-            localStorage.setItem("glovo_newsletter", JSON.stringify(newsletterList));
-            document.getElementById("new-nl-title").value = "";
-            document.getElementById("new-nl-content").value = "";
-            renderNewsAndNewsletter();
+        // Search Filter on Main Page
+        function filterCategoriesOnHome() {
+            const term = document.getElementById('main-search').value.toLowerCase();
+            const cards = document.querySelectorAll('#categories-grid-container .category-card');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(term) ? 'block' : 'none';
+            });
         }
 
-        function editNewsletter(index) {
-            const item = newsletterList[index];
-            document.getElementById("new-nl-title").value = item.title;
-            document.getElementById("new-nl-content").value = item.content;
-            document.getElementById("edit-nl-index").value = index;
-            document.getElementById("nl-form-title").textContent = "✏️ Edytuj Newsletter";
-            document.getElementById("nl-submit-btn").textContent = "Zapisz zmiany";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Checklist Handler
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
         }
 
-        function deleteNewsletter(index) {
-            if (confirm("Czy na pewno chcesz usunąć ten biuletyn?")) {
-                newsletterList.splice(index, 1);
-                localStorage.setItem("glovo_newsletter", JSON.stringify(newsletterList));
-                renderNewsAndNewsletter();
-            }
-        }
-
-        // ASYSTENT CZASU (STOPER)
+        // Timer Functionality
         let timerInterval = null;
-        let secondsElapsed = 0;
+        let seconds = 0;
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+        }
 
         function startTimer() {
             if (timerInterval) return;
             timerInterval = setInterval(() => {
-                secondsElapsed++;
+                seconds++;
                 updateTimerDisplay();
             }, 1000);
         }
@@ -1197,92 +1018,192 @@
 
         function resetTimer() {
             stopTimer();
-            secondsElapsed = 0;
+            seconds = 0;
             updateTimerDisplay();
         }
 
-        function updateTimerDisplay() {
-            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-            const secs = String(secondsElapsed % 60).padStart(2, '0');
-            document.getElementById("timer-display").textContent = `${mins}:${secs}`;
-        }
-
-        // ZWIJANIE DOLNEGO MENU
+        // Bottom Nav Toggle
         let isNavCollapsed = false;
         function toggleBottomNav() {
+            const nav = document.getElementById('bottom-nav-bar');
+            const arrow = document.getElementById('collapse-arrow');
             isNavCollapsed = !isNavCollapsed;
-            const navBar = document.getElementById("bottom-nav-bar");
-            const arrow = document.getElementById("collapse-arrow");
             if (isNavCollapsed) {
-                navBar.classList.add("collapsed");
-                arrow.textContent = "▲ Rozwiń menu";
+                nav.classList.add('collapsed');
+                arrow.innerText = '▲ Rozwiń menu';
             } else {
-                navBar.classList.remove("collapsed");
-                arrow.textContent = "▼ Zwiń menu";
+                nav.classList.remove('collapsed');
+                arrow.innerText = '▼ Zwiń menu';
             }
         }
 
-        // CHECKLISTA
-        function toggleCheck(element) {
-            element.classList.toggle("checked");
+        // Admin Auth & Dynamic Rendering
+        function checkAdminLogin() {
+            const email = document.getElementById('admin-email').value.trim();
+            const id = document.getElementById('admin-id').value.trim();
+            const pin = document.getElementById('admin-pin').value;
+
+            // Poprawne dane dostępowe (można zmienić wedle potrzeb)
+            const correctEmail = "admin@example.com";
+            const correctId = "admin123";
+            const correctPin = "1234";
+
+            if (email === correctEmail && id === correctId && pin === correctPin) {
+                document.getElementById('admin-login-box').style.display = 'none';
+                document.getElementById('admin-dashboard-box').style.display = 'block';
+                renderAdminLists();
+            } else {
+                alert('Błędny adres e-mail, ID lub kod PIN!');
+                document.getElementById('admin-pin').value = '';
+            }
         }
 
-        // NAWIGACJA WIDOKÓW
-        function navigateTo(viewName) {
-            document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
-            document.querySelectorAll(".nav-tile").forEach(tile => tile.classList.remove("active"));
-
-            const targetPanel = document.getElementById(`view-${viewName}`);
-            const targetTile = document.getElementById(`tile-${viewName}`);
-
-            if (targetPanel) targetPanel.classList.add("active");
-            if (targetTile) targetTile.classList.add("active");
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function adminLogout() {
+            document.getElementById('admin-dashboard-box').style.display = 'none';
+            document.getElementById('admin-login-box').style.display = 'block';
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-id').value = '';
+            document.getElementById('admin-pin').value = '';
         }
 
-        // OTWIERANIE KATEGORIE WIEDZY
-        function openCategoryView(key) {
-            const data = categoryData[key];
-            if (!data) return;
+        function renderLists() {
+            // Live news ticker & list
+            const tickerText = document.getElementById('live-ticker-text');
+            const newsContainer = document.getElementById('news-container');
 
-            const contentArea = document.getElementById("detail-content-area");
+            if (newsData.length > 0) {
+                tickerText.innerText = newsData[0].text;
+                newsContainer.innerHTML = newsData.map(item => `
+                    <div class="news-item">
+                        <div class="news-date">${item.date}</div>
+                        <div>${item.text}</div>
+                    </div>
+                `).join('');
+            } else {
+                tickerText.innerText = 'Obecnie brak ważnych komunikatów.';
+                newsContainer.innerHTML = '<p class="empty-notice">Brak aktualnych wiadomości.</p>';
+            }
 
-            let stepsHTML = "";
-            data.steps.forEach(step => {
-                stepsHTML += `<li style="position: relative; padding-left: 24px; margin-bottom: 10px;"><span style="position: absolute; left: 0; color: var(--green);">✓</span>${step}</li>`;
-            });
+            // Newsletter
+            const nlContainer = document.getElementById('newsletter-container');
+            if (newsletterData.length > 0) {
+                nlContainer.innerHTML = newsletterData.map(item => `
+                    <div class="news-item" style="border-left-color: var(--yellow);">
+                        <div class="news-date">${item.date}</div>
+                        <h4 style="color: var(--yellow); margin-bottom: 4px;">${item.title}</h4>
+                        <div>${item.content}</div>
+                    </div>
+                `).join('');
+            } else {
+                nlContainer.innerHTML = '<p class="empty-notice">Brak postów w newsletterze.</p>';
+            }
+        }
 
-            contentArea.innerHTML = `
-                <div class="detail-card">
-                    <h2>${data.title}</h2>
-                    <p>${data.description}</p>
-                    <h4 style="color: var(--green); margin-top: 18px; font-size: 15px;">Kluczowe zasady i instrukcje:</h4>
-                    <ul style="list-style: none; margin-top: 12px; font-size: 14px;">
-                        ${stepsHTML}
-                    </ul>
+        function renderAdminLists() {
+            // News list in Admin panel
+            const newsList = document.getElementById('admin-news-list');
+            newsList.innerHTML = newsData.map((item, index) => `
+                <div class="admin-manage-item">
+                    <span style="font-size: 13px;">${item.text}</span>
+                    <div class="admin-manage-actions">
+                        <button class="btn-sm btn-edit" onclick="editNews(${index})">Edytuj</button>
+                        <button class="btn-sm btn-del" onclick="deleteNews(${index})">Usuń</button>
+                    </div>
                 </div>
-            `;
+            `).join('');
 
-            document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
-            document.getElementById("view-details").classList.add("active");
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Newsletter list in Admin panel
+            const nlList = document.getElementById('admin-nl-list');
+            nlList.innerHTML = newsletterData.map((item, index) => `
+                <div class="admin-manage-item">
+                    <span style="font-size: 13px;"><strong>${item.title}</strong></span>
+                    <div class="admin-manage-actions">
+                        <button class="btn-sm btn-edit" onclick="editNewsletter(${index})">Edytuj</button>
+                        <button class="btn-sm btn-del" onclick="deleteNewsletter(${index})">Usuń</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // WYSZUKIWARKA NA STRONIE GŁÓWNEJ
-        function filterCategoriesOnHome() {
-            const query = document.getElementById("main-search").value.toLowerCase().trim();
-            const cards = document.querySelectorAll("#categories-grid-container .category-card");
+        // Live News CRUD
+        function saveNews() {
+            const textInput = document.getElementById('new-news-text');
+            const editIndex = parseInt(document.getElementById('edit-news-index').value);
+            if (!textInput.value.trim()) return;
 
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? "block" : "none";
-            });
+            if (editIndex === -1) {
+                newsData.unshift({ id: Date.now(), date: 'Teraz', text: textInput.value.trim() });
+            } else {
+                newsData[editIndex].text = textInput.value.trim();
+                document.getElementById('edit-news-index').value = -1;
+                document.getElementById('news-form-title').innerText = '📢 Dodaj nowy Live News';
+                document.getElementById('news-submit-btn').innerText = 'Opublikuj Live News';
+            }
+            textInput.value = '';
+            renderLists();
+            renderAdminLists();
         }
 
-        // Inicjalizacja widoku
-        renderNewsAndNewsletter();
+        function editNews(index) {
+            document.getElementById('new-news-text').value = newsData[index].text;
+            document.getElementById('edit-news-index').value = index;
+            document.getElementById('news-form-title').innerText = '✏️ Edytuj Live News';
+            document.getElementById('news-submit-btn').innerText = 'Zapisz zmiany';
+        }
+
+        function deleteNews(index) {
+            newsData.splice(index, 1);
+            renderLists();
+            renderAdminLists();
+        }
+
+        // Newsletter CRUD
+        function saveNewsletter() {
+            const titleInput = document.getElementById('new-nl-title');
+            const contentInput = document.getElementById('new-nl-content');
+            const editIndex = parseInt(document.getElementById('edit-nl-index').value);
+
+            if (!titleInput.value.trim() || !contentInput.value.trim()) return;
+
+            if (editIndex === -1) {
+                newsletterData.unshift({
+                    id: Date.now(),
+                    date: new Date().toLocaleDateString('pl-PL'),
+                    title: titleInput.value.trim(),
+                    content: contentInput.value.trim()
+                });
+            } else {
+                newsletterData[editIndex].title = titleInput.value.trim();
+                newsletterData[editIndex].content = contentInput.value.trim();
+                document.getElementById('edit-nl-index').value = -1;
+                document.getElementById('nl-form-title').innerText = '📬 Dodaj wpis do Newslettera';
+                document.getElementById('nl-submit-btn').innerText = 'Opublikuj Newsletter';
+            }
+
+            titleInput.value = '';
+            contentInput.value = '';
+            renderLists();
+            renderAdminLists();
+        }
+
+        function editNewsletter(index) {
+            document.getElementById('new-nl-title').value = newsletterData[index].title;
+            document.getElementById('new-nl-content').value = newsletterData[index].content;
+            document.getElementById('edit-nl-index').value = index;
+            document.getElementById('nl-form-title').innerText = '✏️ Edytuj Newsletter';
+            document.getElementById('nl-submit-btn').innerText = 'Zapisz zmiany';
+        }
+
+        function deleteNewsletter(index) {
+            newsletterData.splice(index, 1);
+            renderLists();
+            renderAdminLists();
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLists();
+        });
     </script>
 </body>
 </html>
