@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffc244">
-    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News, Asystent czasu, Newsletter i Panel Admina z opcją edycji i usuwania.">
+    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News, Newsletter i Panel Admina z opcją edycji, usuwania i trybem konserwacji.">
     <title>Centrum Wiedzy Kuriera | Glovo LED Portal</title>
 
     <style>
@@ -48,6 +48,30 @@
         button, input, select, textarea {
             font: inherit;
             color: inherit;
+        }
+
+        /* --- BANER PRZERWY TECHNICZNEJ / KONSERWACJI --- */
+        .maintenance-banner {
+            display: none;
+            background: linear-gradient(90deg, rgba(255, 194, 68, 0.2), rgba(255, 77, 77, 0.25), rgba(255, 194, 68, 0.2));
+            border-bottom: 2px solid var(--yellow);
+            box-shadow: 0 0 20px var(--yellow-glow);
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--yellow);
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-bottom-color: var(--yellow); }
+            50% { border-bottom-color: var(--red-neon); }
+            100% { border-bottom-color: var(--yellow); }
         }
 
         /* --- LED HEADER --- */
@@ -385,6 +409,12 @@
             cursor: pointer;
             width: 100%;
             box-shadow: 0 0 15px var(--yellow-glow);
+            transition: all 0.2s;
+        }
+
+        .btn-admin:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .admin-manage-item {
@@ -417,6 +447,62 @@
         .btn-edit { background: var(--blue-neon); color: var(--dark-bg); }
         .btn-del { background: var(--red-neon); color: #fff; }
 
+        /* TOGGLE SWITCH FOR MAINTENANCE */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 194, 68, 0.08);
+            border: 1px solid rgba(255, 194, 68, 0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid var(--text-muted);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--yellow);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: var(--dark-bg);
+        }
+
         /* --- BOTTOM TILE NAVIGATION --- */
         .bottom-nav {
             position: fixed;
@@ -434,8 +520,8 @@
             max-width: 950px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
             padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
         }
 
@@ -443,23 +529,23 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
-            padding: 6px 2px;
+            padding: 8px 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 3px;
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: center;
         }
 
         .nav-tile span {
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .nav-tile p {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-muted);
             line-height: 1;
@@ -484,16 +570,21 @@
 
         @media (max-width: 650px) {
             .nav-tile p {
-                font-size: 8px;
+                font-size: 9px;
             }
             .nav-tile span {
-                font-size: 14px;
+                font-size: 15px;
             }
         }
     </style>
 </head>
 
 <body>
+
+    <!-- PASEK INFORMACYJNY O TRAJĄCEJ AKTUALIZACJI / KONSERWACJI -->
+    <div id="maintenance-banner" class="maintenance-banner">
+        ⚠️ Strona jest aktualizowana, przepraszamy ale robimy to dla ciebie
+    </div>
 
     <!-- HERO HEADER -->
     <header class="hero">
@@ -699,40 +790,54 @@
         </section>
 
 
-        <!-- WIDOK 7: PANEL ADMINA (Z EDYCJĄ I USUWANIEM) -->
+        <!-- WIDOK 7: PANEL ADMINA -->
         <section id="view-admin" class="view-panel">
             <button class="back-button" onclick="navigateTo('home')">
                 ← Powrót do ekranu głównego
             </button>
 
+            <!-- FORMULARZ LOGOWANIA -->
             <div class="detail-card" id="admin-login-box">
                 <h2>🔐 Panel Administratora</h2>
-                <p>Wprowadź adres e-mail, ID oraz kod PIN, aby zarządzać ogłoszeniami.</p>
+                <p>Wprowadź adres e-mail, ID oraz kod PIN, aby zarządzać ogłoszeniami i ustawieniami.</p>
                 
                 <div class="admin-form-group" style="margin-top: 15px;">
                     <label for="admin-email">Adres e-mail:</label>
-                    <input type="email" id="admin-email" placeholder="Wpisz e-mail">
+                    <input type="email" id="admin-email" placeholder="Wpisz e-mail (admin@glovo.pl)">
                 </div>
 
                 <div class="admin-form-group" style="margin-top: 15px;">
                     <label for="admin-id">ID użytkownika:</label>
-                    <input type="text" id="admin-id" placeholder="Wpisz ID">
+                    <input type="text" id="admin-id" placeholder="Wpisz ID (777)">
                 </div>
 
                 <div class="admin-form-group" style="margin-top: 15px;">
                     <label for="admin-pin">Kod PIN:</label>
-                    <input type="password" id="admin-pin" placeholder="Wpisz PIN..." onkeydown="if(event.key === 'Enter') checkAdminLogin()">
+                    <input type="password" id="admin-pin" placeholder="Wpisz PIN (1234)..." onkeydown="if(event.key === 'Enter') checkAdminLogin()">
                 </div>
 
                 <button class="btn-admin" onclick="checkAdminLogin()" style="margin-top: 10px;">Zaloguj się</button>
             </div>
 
+            <!-- DASHBOARD ADMINA -->
             <div class="detail-card" id="admin-dashboard-box" style="display: none;">
                 <h2>🛠️ Panel Zarządzania Treścią</h2>
-                <p style="color: var(--green);">Zalogowano pomyślnie.</p>
+                <p style="color: var(--green); margin-bottom: 20px;">Zalogowano pomyślnie jako Administrator.</p>
 
-                <!-- LIVE NEWS ADMIN SECTION -->
-                <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
+                <!-- PRZEŁĄCZNIK TRYBU KONSERWACJI / AKTUALIZACJI STRONY -->
+                <div class="toggle-container">
+                    <div>
+                        <strong style="color: var(--yellow); font-size: 14px; display: block;">🚧 Tryb Aktualizacji Strony</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Wyświetla komunikat: "Strona jest aktualizowana, przepraszamy ale robimy to dla ciebie"</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="maintenance-toggle" onchange="toggleMaintenanceMode(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- ZARZĄDZANIE LIVE NEWS -->
+                <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 25px 0 20px 0;">
                 <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--yellow);" id="news-form-title">📢 Dodaj nowy Live News</h3>
                 <input type="hidden" id="edit-news-index" value="-1">
                 <div class="admin-form-group">
@@ -746,7 +851,7 @@
                     <div id="admin-news-list"></div>
                 </div>
 
-                <!-- NEWSLETTER ADMIN SECTION -->
+                <!-- ZARZĄDZANIE NEWSLETTEREM -->
                 <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 25px 0 20px 0;">
                 <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--yellow);" id="nl-form-title">📬 Dodaj wpis do Newslettera</h3>
                 <input type="hidden" id="edit-nl-index" value="-1">
@@ -788,17 +893,11 @@
             <div class="nav-tile" id="tile-newsletter" onclick="navigateTo('newsletter')">
                 <span>📬</span><p>Newsletter</p>
             </div>
-            <div class="nav-tile" id="tile-assistant" onclick="navigateTo('assistant')">
-                <span>📱</span><p>Rider</p>
-            </div>
             <div class="nav-tile" id="tile-errors" onclick="navigateTo('errors')">
                 <span>⚠️</span><p>FAQ Błędy</p>
             </div>
             <div class="nav-tile" id="tile-admin" onclick="navigateTo('admin')">
                 <span>🔐</span><p>Admin</p>
-            </div>
-            <div class="nav-tile" id="tile-time" onclick="openCategoryView('sessions')">
-                <span>⏱️</span><p>Off Slot</p>
             </div>
         </div>
     </nav>
@@ -813,9 +912,9 @@
                     <p>Aby rozpocząć dostawy z Glovo, musisz przejść przez kilka prostych kroków rejestracyjnych oraz wyposażyć się w niezbędny sprzęt:</p>
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
                         <li><strong>Rejestracja online:</strong> Wypełnienie formularza zgłoszeniowego i wybór partnera flotowego.</li>
-                        <li><strong>Dokumenty:</strong> Dowód osobisty, zaświadczenie o niekaralności (w zależności od wymagań partnera) oraz aktywne konto bankowe.</li>
+                        <li><strong>Dokumenty:</strong> Dowód osobisty, zaświadczenie o niekaralności oraz aktywne konto bankowe.</li>
                         <li><strong>Odbiór sprzętu:</strong> Torba izotermiczna Glovo oraz odzież odblaskowa.</li>
-                        <li><strong>Aktywacja konta w aplikacji Courier:</strong> Konfiguracja profilu i przejście krótkiego szkolenia wdrożeniowego.</li>
+                        <li><strong>Aktywacja konta w aplikacji Courier:</strong> Konfiguracja profilu i przejście krótkiego szkolenia.</li>
                     </ul>
                 `
             },
@@ -823,11 +922,11 @@
                 title: '💰 Rozliczenia i wypłaty',
                 desc: 'Wszystko o zarobkach, terminach przelewów i podatkach.',
                 content: `
-                    <p>Zasady rozliczeń zależą od wybranej formy współpracy (np. działalność gospodarcza lub rozliczenie poprzez partnera flotowego):</p>
+                    <p>Zasady rozliczeń zależą od wybranej formy współpracy (działalność lub partner flotowy):</p>
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
                         <li><strong>Cykl rozliczeniowy:</strong> Standardowo rozliczenia odbywają się co tydzień lub co dwa tygodnie.</li>
-                        <li><strong>Składowe zarobków:</strong> Stawka bazowa za zlecenie, dodatek za kilometry oraz mnożniki strefowe i bonusy pogodowe.</li>
-                        <li><strong>Fakturowanie:</strong> W przypadku partnerów flotowych, rachunki generowane są automatycznie w systemie partnera.</li>
+                        <li><strong>Składowe zarobków:</strong> Stawka bazowa za zlecenie, dodatek za kilometry oraz mnożniki strefowe i bonusy.</li>
+                        <li><strong>Fakturowanie:</strong> Rachunki generowane są automatycznie w systemie partnera.</li>
                     </ul>
                 `
             },
@@ -838,8 +937,8 @@
                     <p>System dostępności (Off Slot) pozwala na elastyczne planowanie pracy:</p>
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
                         <li><strong>Rezerwacja slotów:</strong> Planowanie godzin z wyprzedzeniem gwarantuje pierwszeństwo w przydzielaniu zleceń.</li>
-                        <li><strong>Praca Off Slot:</strong> Możliwość logowania się do systemu bez wcześniejszej rezerwacji, gdy zapotrzebowanie w strefie jest wysokie.</li>
-                        <li><strong>Wskaźnik niezawodności:</strong> Pilnowanie godzin rozpoczęcia i zakończenia sesji wpływa na Twój ranking.</li>
+                        <li><strong>Praca Off Slot:</strong> Logowanie do systemu bez wcześniejszej rezerwacji przy wysokim zapotrzebowaniu.</li>
+                        <li><strong>Wskaźnik niezawodności:</strong> Godziny rozpoczęcia i zakończenia sesji wpływają na Twój ranking.</li>
                     </ul>
                 `
             },
@@ -847,11 +946,11 @@
                 title: '🛵 Realizacja zamówień krok po kroku',
                 desc: 'Optymalna ścieżka obsługi klienta i punktu partnerskiego.',
                 content: `
-                    <p>Prawidłowy przebieg realizacji zamówienia gwarantuje wysokie oceny i brak sporów:</p>
+                    <p>Prawidłowy przebieg realizacji zamówienia gwarantuje wysokie oceny:</p>
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
-                        <li><strong>Odbiór z restauracji/sklepu:</strong> Zgłoszenie przybycia, sprawdzenie kompletności zamówienia i zapakowanie do torby izotermicznej.</li>
-                        <li><strong>Dostawa do klienta:</strong> Korzystanie z optymalnej nawigacji, kulturalny kontakt i wydanie przesyłki.</li>
-                        <li><strong>Obsługa płatności gotówkowych:</strong> Wydawanie reszty i rozliczanie pobrań zgodnie z wytycznymi aplikacji.</li>
+                        <li><strong>Odbiór z punktu:</strong> Zgłoszenie przybycia, sprawdzenie kompletności i spakowanie do torby.</li>
+                        <li><strong>Dostawa do klienta:</strong> Nawigacja, kulturalny kontakt i wydanie przesyłki.</li>
+                        <li><strong>Obsługa płatności gotówkowych:</strong> Wydawanie reszty i rozliczanie pobrań.</li>
                     </ul>
                 `
             },
@@ -861,43 +960,37 @@
                 content: `
                     <p>Najczęstsze problemy techniczne i sposoby ich szybkiego rozwiązania:</p>
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
-                        <li><strong>Brak zleceń / zawieszona mapa:</strong> Wyczyszczenie pamięci podręcznej aplikacji Courier lub ponowne uruchomienie telefonu.</li>
-                        <li><strong>Problem z GPS:</strong> Upewnij się, że tryb oszczędzania baterii nie blokuje lokalizacji w tle.</li>
-                        <li><strong>Kontakt z Supportem:</strong> Używaj czatu w aplikacji w celu natychmiastowego zgłoszenia błędu zamówienia.</li>
+                        <li><strong>Brak zleceń / zawieszona mapa:</strong> Wyczyszczenie pamięci cache aplikacji lub restart telefonu.</li>
+                        <li><strong>Problem z GPS:</strong> Wyłączenie oszczędzania baterii w tle dla aplikacji Courier.</li>
+                        <li><strong>Kontakt z Supportem:</strong> Czat w aplikacji w celu zgłoszenia problemu ze zleceniem.</li>
                     </ul>
                 `
             }
         };
 
-        // --- PAMIĘĆ LOKALNA (NEWS I NEWSLETTER) ---
+        // --- DANE BAZOWE (ZAPISYWANE W LOCALSTORAGE) ---
         let liveNewsList = JSON.parse(localStorage.getItem('glovo_live_news')) || [
-            { id: 1, text: "🔥 Bonus x1.8 w strefie Śródmieście w godzinach 18:00 - 21:00!", date: "07.06.2026" },
-            { id: 2, text: "⚠️ Prace serwisowe aplikacji w poniedziałek od 3:00 do 5:00 rano.", date: "06.06.2026" }
+            { id: 1, text: "🔥 Bonus x1.8 w strefie Śródmieście w godzinach 18:00 - 21:00!", date: "07.11.2026" },
+            { id: 2, text: "⚠️ Prace serwisowe aplikacji w poniedziałek od 3:00 do 5:00 rano.", date: "06.11.2026" }
         ];
 
         let newsletterList = JSON.parse(localStorage.getItem('glovo_newsletter')) || [
-            { id: 1, title: "Nowe zasady parkowania w strefie", content: "Przypominamy o zakazie wjeżdżania skuterami na deptaki miejskie. Dbajmy o bezpieczeństwo pieszych.", date: "05.06.2026" },
-            { id: 2, title: "Program poleceń - Zgarnij bonus", content: "Poleć znajomego kuriera i odbierz dodatkowy bonus po przepracowaniu przez niego 50 godzin.", date: "01.06.2026" }
+            { id: 1, title: "Nowe zasady parkowania w strefie", content: "Przypominamy o zakazie wjeżdżania skuterami na deptaki miejskie. Dbajmy o bezpieczeństwo pieszych.", date: "05.11.2026" },
+            { id: 2, title: "Program poleceń - Zgarnij bonus", content: "Poleć znajomego kuriera i odbierz dodatkowy bonus po przepracowaniu przez niego 50 godzin.", date: "01.11.2026" }
         ];
 
-        // --- NAWIGACJA MIĘDZY WIDOKAMI ---
+        let isMaintenanceMode = JSON.parse(localStorage.getItem('glovo_maintenance_mode')) || false;
+
+        // --- NAWIGACJA ---
         function navigateTo(viewId) {
-            document.querySelectorAll('.view-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tile').forEach(tile => {
-                tile.classList.remove('active');
-            });
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.nav-tile').forEach(tile => tile.classList.remove('active'));
 
             const targetView = document.getElementById('view-' + viewId);
-            if (targetView) {
-                targetView.classList.add('active');
-            }
+            if (targetView) targetView.classList.add('active');
 
             const targetTile = document.getElementById('tile-' + viewId);
-            if (targetTile) {
-                targetTile.classList.add('active');
-            }
+            if (targetTile) targetTile.classList.add('active');
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -923,11 +1016,11 @@
             navigateTo('details');
         }
 
-        // --- CHECKLISTA ---
         function toggleCheck(el) {
             el.classList.toggle('checked');
         }
 
+        // --- RENDEROWANIE WIDOKÓW PUBLICZNYCH ---
         function renderNewsView() {
             const container = document.getElementById('news-container');
             if (liveNewsList.length === 0) {
@@ -957,7 +1050,27 @@
             `).join('');
         }
 
-        // --- PANEL ADMINA: LOGOWANIE I ZARZĄDZANIE ---
+        // --- TRYB AKTUALIZACJI / KONSERWACJI STRONY ---
+        function toggleMaintenanceMode(status) {
+            isMaintenanceMode = status;
+            localStorage.setItem('glovo_maintenance_mode', JSON.stringify(isMaintenanceMode));
+            applyMaintenanceState();
+        }
+
+        function applyMaintenanceState() {
+            const banner = document.getElementById('maintenance-banner');
+            const toggleInput = document.getElementById('maintenance-toggle');
+            
+            if (isMaintenanceMode) {
+                banner.style.display = 'block';
+                if (toggleInput) toggleInput.checked = true;
+            } else {
+                banner.style.display = 'none';
+                if (toggleInput) toggleInput.checked = false;
+            }
+        }
+
+        // --- PANEL ADMINA: LOGOWANIE I USŁUGI ---
         function checkAdminLogin() {
             const email = document.getElementById('admin-email').value.trim();
             const id = document.getElementById('admin-id').value.trim();
@@ -967,8 +1080,9 @@
                 document.getElementById('admin-login-box').style.display = 'none';
                 document.getElementById('admin-dashboard-box').style.display = 'block';
                 renderAdminLists();
+                applyMaintenanceState();
             } else {
-                alert("Błędne dane logowania! Sprawdź e-mail, ID oraz PIN.");
+                alert("Błędne dane logowania! Prawidłowe dane testowe:\nEmail: admin@glovo.pl\nID: 777\nPIN: 1234");
             }
         }
 
@@ -981,13 +1095,14 @@
         }
 
         function renderAdminLists() {
+            // News Admin List
             const newsListEl = document.getElementById('admin-news-list');
             if (liveNewsList.length === 0) {
                 newsListEl.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Brak wpisów.</p>';
             } else {
                 newsListEl.innerHTML = liveNewsList.map((item, idx) => `
                     <div class="admin-manage-item">
-                        <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">${item.text}</span>
+                        <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${item.text}</span>
                         <div class="admin-manage-actions">
                             <button class="btn-sm btn-edit" onclick="editNews(${idx})">Edytuj</button>
                             <button class="btn-sm btn-del" onclick="deleteNews(${idx})">Usuń</button>
@@ -996,13 +1111,14 @@
                 `).join('');
             }
 
+            // Newsletter Admin List
             const nlListEl = document.getElementById('admin-nl-list');
             if (newsletterList.length === 0) {
                 nlListEl.innerHTML = '<p style="font-size: 12px; color: var(--text-muted);">Brak wpisów.</p>';
             } else {
                 nlListEl.innerHTML = newsletterList.map((item, idx) => `
                     <div class="admin-manage-item">
-                        <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">${item.title}</span>
+                        <span style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${item.title}</span>
                         <div class="admin-manage-actions">
                             <button class="btn-sm btn-edit" onclick="editNewsletter(${idx})">Edytuj</button>
                             <button class="btn-sm btn-del" onclick="deleteNewsletter(${idx})">Usuń</button>
@@ -1012,7 +1128,7 @@
             }
         }
 
-        // --- ZAPIS / EDYCJA / USUNIĘCIE LIVE NEWS ---
+        // --- EDYCJA / DODAWANIE / USUWANIE: LIVE NEWS ---
         function saveNews() {
             const textInput = document.getElementById('new-news-text');
             const editIndexInput = document.getElementById('edit-news-index');
@@ -1039,7 +1155,7 @@
             textInput.value = '';
             localStorage.setItem('glovo_live_news', JSON.stringify(liveNewsList));
             renderAdminLists();
-            alert("Operacja zakończona sukcesem!");
+            alert("Live News zapisany pomyślnie!");
         }
 
         function editNews(idx) {
@@ -1048,18 +1164,18 @@
             document.getElementById('edit-news-index').value = idx;
             document.getElementById('news-form-title').innerText = "✏️ Edytuj Live News";
             document.getElementById('news-submit-btn').innerText = "Zapisz zmiany";
-            window.scrollTo({ top: document.getElementById('news-form-title').offsetTop - 100, behavior: 'smooth' });
+            window.scrollTo({ top: document.getElementById('news-form-title').offsetTop - 80, behavior: 'smooth' });
         }
 
         function deleteNews(idx) {
-            if (confirm("Czy na pewno chcesz usunąć ten komunikat?")) {
+            if (confirm("Czy na pewno chcesz usunąć ten komunikat Live News?")) {
                 liveNewsList.splice(idx, 1);
                 localStorage.setItem('glovo_live_news', JSON.stringify(liveNewsList));
                 renderAdminLists();
             }
         }
 
-        // --- ZAPIS / EDYCJA / USUNIĘCIE NEWSLETTERA ---
+        // --- EDYCJA / DODAWANIE / USUWANIE: NEWSLETTER ---
         function saveNewsletter() {
             const titleInput = document.getElementById('new-nl-title');
             const contentInput = document.getElementById('new-nl-content');
@@ -1091,7 +1207,7 @@
             contentInput.value = '';
             localStorage.setItem('glovo_newsletter', JSON.stringify(newsletterList));
             renderAdminLists();
-            alert("Operacja zakończona sukcesem!");
+            alert("Wpis w Newsletterze zapisany pomyślnie!");
         }
 
         function editNewsletter(idx) {
@@ -1101,7 +1217,7 @@
             document.getElementById('edit-nl-index').value = idx;
             document.getElementById('nl-form-title').innerText = "✏️ Edytuj wpis w Newsletterze";
             document.getElementById('nl-submit-btn').innerText = "Zapisz zmiany";
-            window.scrollTo({ top: document.getElementById('nl-form-title').offsetTop - 100, behavior: 'smooth' });
+            window.scrollTo({ top: document.getElementById('nl-form-title').offsetTop - 80, behavior: 'smooth' });
         }
 
         function deleteNewsletter(idx) {
@@ -1111,6 +1227,11 @@
                 renderAdminLists();
             }
         }
+
+        // INICJALIZACJA PRZY STARTOWANIU STRONY
+        window.addEventListener('DOMContentLoaded', () => {
+            applyMaintenanceState();
+        });
     </script>
 </body>
 </html>
