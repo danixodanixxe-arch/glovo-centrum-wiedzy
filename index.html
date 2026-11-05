@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffc244">
-    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News, Newsletter i Panel Admina z opcją edycji, usuwania i trybem konserwacji.">
+    <meta name="description" content="Centrum Wiedzy Kuriera Glovo — poradniki, Live News, Newsletter i Panel Admina.">
     <title>Centrum Wiedzy Kuriera | Glovo LED Portal</title>
 
     <style>
@@ -50,28 +50,38 @@
             color: inherit;
         }
 
-        /* --- BANER PRZERWY TECHNICZNEJ / KONSERWACJI --- */
-        .maintenance-banner {
+        /* --- PEŁNOEKRANOWY EKRAN KONSERWACJI DLA GOŚCI --- */
+        #maintenance-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 14, 12, 0.98);
+            z-index: 9999;
             display: none;
-            background: linear-gradient(90deg, rgba(255, 194, 68, 0.2), rgba(255, 77, 77, 0.25), rgba(255, 194, 68, 0.2));
-            border-bottom: 2px solid var(--yellow);
-            box-shadow: 0 0 20px var(--yellow-glow);
-            padding: 12px 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             text-align: center;
-            font-weight: 700;
-            color: var(--yellow);
-            font-size: 14px;
-            position: sticky;
-            top: 0;
-            z-index: 200;
-            backdrop-filter: blur(10px);
-            animation: pulse-border 2s infinite;
         }
 
-        @keyframes pulse-border {
-            0% { border-bottom-color: var(--yellow); }
-            50% { border-bottom-color: var(--red-neon); }
-            100% { border-bottom-color: var(--yellow); }
+        .maintenance-card {
+            background: var(--card-bg);
+            border: 1px solid var(--yellow);
+            border-radius: var(--radius-xl);
+            padding: 40px 30px;
+            max-width: 500px;
+            box-shadow: 0 0 30px var(--yellow-glow);
+        }
+
+        .maintenance-card h2 {
+            color: var(--yellow);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .maintenance-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
         }
 
         /* --- LED HEADER --- */
@@ -581,9 +591,13 @@
 
 <body>
 
-    <!-- PASEK INFORMACYJNY O TRAJĄCEJ AKTUALIZACJI / KONSERWACJI -->
-    <div id="maintenance-banner" class="maintenance-banner">
-        ⚠️ Strona jest aktualizowana, przepraszamy ale robimy to dla ciebie
+    <!-- PEŁNOEKRANOWY KOMUNIKAT DLA ODWIEDZAJĄCYCH (GDY WŁĄCZONA KONSERWACJA) -->
+    <div id="maintenance-overlay">
+        <div class="maintenance-card">
+            <h2>🚧 Trwa przerwa techniczna</h2>
+            <p>Strona jest aktualizowana, przepraszamy ale robimy to dla ciebie.</p>
+            <button class="btn-admin" onclick="navigateTo('admin')">Zaloguj się jako Admin</button>
+        </div>
     </div>
 
     <!-- HERO HEADER -->
@@ -799,7 +813,7 @@
             <!-- FORMULARZ LOGOWANIA -->
             <div class="detail-card" id="admin-login-box">
                 <h2>🔐 Panel Administratora</h2>
-                <p>Wprowadź adres e-mail, ID oraz kod PIN, aby zarządzać ogłoszeniami i ustawieniami.</p>
+                <p>Wprowadź adres e-mail, ID oraz kod PIN, aby zalogować się jako administrator i zarządzać stroną.</p>
                 
                 <div class="admin-form-group" style="margin-top: 15px;">
                     <label for="admin-email">Adres e-mail:</label>
@@ -822,13 +836,13 @@
             <!-- DASHBOARD ADMINA -->
             <div class="detail-card" id="admin-dashboard-box" style="display: none;">
                 <h2>🛠️ Panel Zarządzania Treścią</h2>
-                <p style="color: var(--green); margin-bottom: 20px;">Zalogowano pomyślnie jako Administrator.</p>
+                <p style="color: var(--green); margin-bottom: 20px;">Zalogowano pomyślnie jako Administrator. Masz pełny dostęp do podglądu i edycji.</p>
 
-                <!-- PRZEŁĄCZNIK TRYBU KONSERWACJI / AKTUALIZACJI STRONY -->
+                <!-- PRZEŁĄCZNIK TRYBU KONSERWACJI -->
                 <div class="toggle-container">
                     <div>
-                        <strong style="color: var(--yellow); font-size: 14px; display: block;">🚧 Tryb Aktualizacji Strony</strong>
-                        <span style="font-size: 12px; color: var(--text-muted);">Wyświetla komunikat: "Strona jest aktualizowana, przepraszamy ale robimy to dla ciebie"</span>
+                        <strong style="color: var(--yellow); font-size: 14px; display: block;">🚧 Tryb Konserwacji (Blokada dla gości)</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Gdy włączone, zwykli użytkownicy widzą komunikat: "Strona jest aktualizowana..."</span>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="maintenance-toggle" onchange="toggleMaintenanceMode(this.checked)">
@@ -938,7 +952,7 @@
                     <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted); line-height: 1.8;">
                         <li><strong>Rezerwacja slotów:</strong> Planowanie godzin z wyprzedzeniem gwarantuje pierwszeństwo w przydzielaniu zleceń.</li>
                         <li><strong>Praca Off Slot:</strong> Logowanie do systemu bez wcześniejszej rezerwacji przy wysokim zapotrzebowaniu.</li>
-                        <li><strong>Wskaźnik niezawodności:</strong> Godziny rozpoczęcia i zakończenia sesji wpływają na Twój ranking.</li>
+                        <li><strong>Wskaźnik niezawodności:</strong> Godziny rozpoczęcia i zakończenia sesji wpływa na Twój ranking.</li>
                     </ul>
                 `
             },
@@ -980,6 +994,7 @@
         ];
 
         let isMaintenanceMode = JSON.parse(localStorage.getItem('glovo_maintenance_mode')) || false;
+        let isAdminLoggedIn = JSON.parse(localStorage.getItem('glovo_admin_logged')) || false;
 
         // --- NAWIGACJA ---
         function navigateTo(viewId) {
@@ -1050,7 +1065,7 @@
             `).join('');
         }
 
-        // --- TRYB AKTUALIZACJI / KONSERWACJI STRONY ---
+        // --- SPRAWDZANIE I AKTUALIZACJA TRYBU KONSERWACJI ---
         function toggleMaintenanceMode(status) {
             isMaintenanceMode = status;
             localStorage.setItem('glovo_maintenance_mode', JSON.stringify(isMaintenanceMode));
@@ -1058,40 +1073,50 @@
         }
 
         function applyMaintenanceState() {
-            const banner = document.getElementById('maintenance-banner');
+            const overlay = document.getElementById('maintenance-overlay');
             const toggleInput = document.getElementById('maintenance-toggle');
-            
-            if (isMaintenanceMode) {
-                banner.style.display = 'block';
-                if (toggleInput) toggleInput.checked = true;
+
+            if (toggleInput) toggleInput.checked = isMaintenanceMode;
+
+            // Jeśli tryb konserwacji JEST włączony, ALE admin NIE jest zalogowany -> pokaż pełnoekranowy komunikat blokujący
+            if (isMaintenanceMode && !isAdminLoggedIn) {
+                overlay.style.display = 'flex';
             } else {
-                banner.style.display = 'none';
-                if (toggleInput) toggleInput.checked = false;
+                overlay.style.display = 'none'; // Admin lub brak konserwacji widzą stronę normalnie
             }
         }
 
-        // --- PANEL ADMINA: LOGOWANIE I USŁUGI ---
+        // --- PANEL ADMINA: LOGOWANIE I ZARZĄDZANIE ---
         function checkAdminLogin() {
             const email = document.getElementById('admin-email').value.trim();
             const id = document.getElementById('admin-id').value.trim();
             const pin = document.getElementById('admin-pin').value.trim();
 
             if (email === "admin@glovo.pl" && id === "777" && pin === "1234") {
+                isAdminLoggedIn = true;
+                localStorage.setItem('glovo_admin_logged', JSON.stringify(isAdminLoggedIn));
+                
                 document.getElementById('admin-login-box').style.display = 'none';
                 document.getElementById('admin-dashboard-box').style.display = 'block';
+                
                 renderAdminLists();
-                applyMaintenanceState();
+                applyMaintenanceState(); // Schowa ekran konserwacji dla admina
             } else {
-                alert("Błędne dane logowania! Prawidłowe dane testowe:\nEmail: admin@glovo.pl\nID: 777\nPIN: 1234");
+                alert("Błędne dane logowania!\nDane testowe:\nEmail: admin@glovo.pl\nID: 777\nPIN: 1234");
             }
         }
 
         function adminLogout() {
+            isAdminLoggedIn = false;
+            localStorage.setItem('glovo_admin_logged', JSON.stringify(isAdminLoggedIn));
+
             document.getElementById('admin-login-box').style.display = 'block';
             document.getElementById('admin-dashboard-box').style.display = 'none';
             document.getElementById('admin-email').value = '';
             document.getElementById('admin-id').value = '';
             document.getElementById('admin-pin').value = '';
+            
+            applyMaintenanceState(); // Jeśli tryb jest włączony, po wylogowaniu zablokuje stronę
         }
 
         function renderAdminLists() {
@@ -1228,9 +1253,15 @@
             }
         }
 
-        // INICJALIZACJA PRZY STARTOWANIU STRONY
+        // INICJALIZACJA PRZY STARCIE STRONY
         window.addEventListener('DOMContentLoaded', () => {
             applyMaintenanceState();
+            // Jeśli administrator był wcześniej zalogowany w sesji przeglądarki, przywróć widok dashboardu admina
+            if (isAdminLoggedIn) {
+                document.getElementById('admin-login-box').style.display = 'none';
+                document.getElementById('admin-dashboard-box').style.display = 'block';
+                renderAdminLists();
+            }
         });
     </script>
 </body>
